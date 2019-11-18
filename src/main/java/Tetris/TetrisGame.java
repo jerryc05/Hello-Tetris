@@ -13,7 +13,7 @@ import javafx.util.Duration;
 public class TetrisGame {
 
   private static final Square[][] mBoard;
-  private static       Piece      mFallingPieces;
+  private static       Piece      mFallingPiece;
   private static       Pane       mPane;
   private static final Label      mGameOverLabel;
   private static final Timeline   mTimeline;
@@ -59,11 +59,11 @@ public class TetrisGame {
             break;
 
           case UP:
-            int centerX = mFallingPieces.getRotationCenterSquare().getX();
-            int centerY = mFallingPieces.getRotationCenterSquare().getY();
+            int centerX = mFallingPiece.getRotationCenterSquare().getX();
+            int centerY = mFallingPiece.getRotationCenterSquare().getY();
             boolean canMove = true;
 
-            for (Square eachSquare : mFallingPieces.getSquares()) { // can move
+            for (Square eachSquare : mFallingPiece.getSquares()) { // can move
               int locX = eachSquare.getX();
               int locY = eachSquare.getY();
               int newX = centerX - centerY + locY;
@@ -80,7 +80,7 @@ public class TetrisGame {
             if (!canMove)
               break;
 
-            for (Square eachSquare : mFallingPieces.getSquares()) { // perform move
+            for (Square eachSquare : mFallingPiece.getSquares()) { // perform move
               int locX = eachSquare.getX();
               int locY = eachSquare.getY();
               int newX = centerX - centerY + locY;
@@ -90,7 +90,7 @@ public class TetrisGame {
               eachSquare.withLocation(newX, newY);
             }
 
-            for (Square eachSquare : mFallingPieces.getSquares())
+            for (Square eachSquare : mFallingPiece.getSquares())
               mBoard[eachSquare.getX()][eachSquare.getY()] = eachSquare;
             break;
 
@@ -122,7 +122,7 @@ public class TetrisGame {
 
   private static boolean canMove(int xOffset, int yOffset) {
     for (int i = 0; i < 4; i++) {
-      Square eachSquare = mFallingPieces.getSquares()[i];
+      Square eachSquare = mFallingPiece.getSquares()[i];
       int    newX       = eachSquare.getX() + xOffset;
       int    newY       = eachSquare.getY() + yOffset;
 
@@ -134,7 +134,7 @@ public class TetrisGame {
   }
 
   private static boolean isNotInFallingSquares(int x, int y) {
-    for (Square eachFallingSquare : mFallingPieces.getSquares()) {
+    for (Square eachFallingSquare : mFallingPiece.getSquares()) {
       if (eachFallingSquare.getX() == x
         && eachFallingSquare.getY() == y)
         return false;
@@ -143,7 +143,7 @@ public class TetrisGame {
   }
 
   private static void moveNow(int xOffset, int yOffset) {
-    for (Square eachSquare : mFallingPieces.getSquares()) {
+    for (Square eachSquare : mFallingPiece.getSquares()) {
       int locX = eachSquare.getX();
       int locY = eachSquare.getY();
       int newX = eachSquare.getX() + xOffset;
@@ -153,7 +153,7 @@ public class TetrisGame {
       eachSquare.withLocation(newX, newY);
     }
 
-    for (Square eachSquare : mFallingPieces.getSquares())
+    for (Square eachSquare : mFallingPiece.getSquares())
       mBoard[eachSquare.getX()][eachSquare.getY()] = eachSquare;
 
     tryClearLine();
@@ -215,7 +215,7 @@ public class TetrisGame {
   }
 
   public static void setFallingPieces(Piece fallingPieces) {
-    mFallingPieces = fallingPieces;
+    mFallingPiece = fallingPieces;
   }
 
   public static Pane getPane() {
