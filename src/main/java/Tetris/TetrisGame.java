@@ -4,6 +4,7 @@ import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.scene.control.Label;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -17,6 +18,7 @@ public class TetrisGame {
   private static final Label      mGameOverLabel;
   private static final Timeline   mTimeline;
   private static       long       mScore;
+  private static       boolean    mIsPaused;
 
   static {
     mBoard = new Square[10][20];
@@ -32,61 +34,72 @@ public class TetrisGame {
 
   public static void withPane(Pane pane) {
     pane.setOnKeyPressed(e -> {
-      switch (e.getCode()) {
-        case LEFT:
-          tryMove(-1, 0);
-          break;
-
-        case RIGHT:
-          tryMove(1, 0);
-          break;
-
-        case DOWN:
-          tryMove(0, 1);
-          break;
-
-        case UP:
-          int centerX = mFallingPieces.getRotationCenterSquare().getX();
-          int centerY = mFallingPieces.getRotationCenterSquare().getY();
-          boolean canMove = true;
-
-          for (Square eachSquare : mFallingPieces.getSquares()) { // can move
-            int locX = eachSquare.getX();
-            int locY = eachSquare.getY();
-            int newX = centerX - centerY + locY;
-            int newY = centerY + centerX - locX;
-
-            if (newX < 0 || newX > 9 || newY < 0 || newY > 19
-              || (mBoard[newX][newY] != null
-              && isNotInFallingSquares(newX, newY))) {
-              canMove = false;
-              break;
-            }
-          }
-
-          if (!canMove)
+      if (mIsPaused) {
+        if (e.getCode() == KeyCode.P) {
+          mIsPaused = false;
+          mTimeline.play();
+        }
+      } else
+        switch (e.getCode()) {
+          case P:
+            mIsPaused = true;
+            mTimeline.pause();
             break;
 
-          for (Square eachSquare : mFallingPieces.getSquares()) { // perform move
-            int locX = eachSquare.getX();
-            int locY = eachSquare.getY();
-            int newX = centerX - centerY + locY;
-            int newY = centerY + centerX - locX;
+          case LEFT:
+            tryMove(-1, 0);
+            break;
 
-            mBoard[locX][locY] = null;
-            eachSquare.withLocation(newX, newY);
-          }
+          case RIGHT:
+            tryMove(1, 0);
+            break;
 
-          for (Square eachSquare : mFallingPieces.getSquares())
-            mBoard[eachSquare.getX()][eachSquare.getY()] = eachSquare;
-          break;
+          case DOWN:
+            tryMove(0, 1);
+            break;
 
-        case SPACE:
-          while (tryMove(0, 1)) ;
+          case UP:
+            int centerX = mFallingPieces.getRotationCenterSquare().getX();
+            int centerY = mFallingPieces.getRotationCenterSquare().getY();
+            boolean canMove = true;
 
-        default:
-          break;
-      }
+            for (Square eachSquare : mFallingPieces.getSquares()) { // can move
+              int locX = eachSquare.getX();
+              int locY = eachSquare.getY();
+              int newX = centerX - centerY + locY;
+              int newY = centerY + centerX - locX;
+
+              if (newX < 0 || newX > 9 || newY < 0 || newY > 19
+                || (mBoard[newX][newY] != null
+                && isNotInFallingSquares(newX, newY))) {
+                canMove = false;
+                break;
+              }
+            }
+
+            if (!canMove)
+              break;
+
+            for (Square eachSquare : mFallingPieces.getSquares()) { // perform move
+              int locX = eachSquare.getX();
+              int locY = eachSquare.getY();
+              int newX = centerX - centerY + locY;
+              int newY = centerY + centerX - locX;
+
+              mBoard[locX][locY] = null;
+              eachSquare.withLocation(newX, newY);
+            }
+
+            for (Square eachSquare : mFallingPieces.getSquares())
+              mBoard[eachSquare.getX()][eachSquare.getY()] = eachSquare;
+            break;
+
+          case SPACE:
+            while (tryMove(0, 1)) ;
+
+          default:
+            break;
+        }
       e.consume();
     });
     pane.setFocusTraversable(true);
